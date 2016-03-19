@@ -1991,8 +1991,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             }
             
             NSAssert1(row != -1, @"expected a row to be found for torrent %@", torrent);
-            [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection:NO];
-            #warning focus the window
+
+            [self showMainWindow: nil];
+            [fTableView selectAndScrollToRow: row];
         }
     }
 }
@@ -2104,8 +2105,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         [notification setHasActionButton: YES];
         [notification setActionButtonTitle: NSLocalizedString(@"Show", "notification button")];
-        
-        notification.additionalActions = @[ [NSUserNotificationAction actionWithIdentifier:@"a" title:@"a"], [NSUserNotificationAction actionWithIdentifier:@"b" title:@"b"] ];
         
         NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [torrent hashString] forKey: @"Hash"];
         if (location)
