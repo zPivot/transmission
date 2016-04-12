@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_DETAILS_DIALOG_H
-#define QTR_DETAILS_DIALOG_H
+#pragma once
 
 #include <QString>
 #include <QMap>
@@ -104,4 +103,3 @@ class DetailsDialog: public BaseDialog
     QMap<QString, QTreeWidgetItem*> myPeers;
 };
 
-#endif // QTR_DETAILS_DIALOG_H
