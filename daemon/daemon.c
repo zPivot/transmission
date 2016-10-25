@@ -4,7 +4,6 @@
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
- * $Id$
  */
 
 #include <errno.h>
@@ -33,7 +32,7 @@
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
 
-#ifdef USE_SYSTEMD_DAEMON
+#ifdef USE_SYSTEMD
  #include <systemd/sd-daemon.h>
 #else
  static void sd_notify (int status UNUSED, const char * str UNUSED) { }

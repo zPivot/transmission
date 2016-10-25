@@ -16,7 +16,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 dnl AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR(libtransmission/transmission.h)
-AM_INIT_AUTOMAKE([1.9 tar-pax no-dist-gzip dist-xz])
+AM_INIT_AUTOMAKE([1.9 tar-pax no-dist-gzip dist-xz foreign])
 LT_INIT
 LT_LIB_M
 
@@ -240,15 +240,15 @@ dnl
 dnl file monitoring for the daemon
 
 # Check whether to enable systemd startup notification.
-# This requires libsystemd-daemon.
-AC_ARG_WITH([systemd-daemon], AS_HELP_STRING([--with-systemd-daemon],
+# This requires libsystemd.
+AC_ARG_WITH([systemd], AS_HELP_STRING([--with-systemd],
             [Add support for systemd startup notification (default is autodetected)]),
-            [USE_SYSTEMD_DAEMON=$withval], [USE_SYSTEMD_DAEMON=auto])
-AS_IF([test "x$USE_SYSTEMD_DAEMON" != "xno"], [
-    PKG_CHECK_MODULES([SYSTEMD_DAEMON], [libsystemd-daemon],
-        [AC_DEFINE(USE_SYSTEMD_DAEMON,1,[Use systemd startup notification])],
-        [AS_IF([test "x$USE_SYSTEMD_DAEMON" = "xyes"],
-            [AC_MSG_ERROR([systemd startup notification support requested, but libsystemd-daemon not found.])]
+            [USE_SYSTEMD=$withval], [USE_SYSTEMD=auto])
+AS_IF([test "x$USE_SYSTEMD" != "xno"], [
+    PKG_CHECK_MODULES([SYSTEMD], [libsystemd],
+        [AC_DEFINE(USE_SYSTEMD,1,[Use systemd startup notification])],
+        [AS_IF([test "x$USE_SYSTEMD" = "xyes"],
+            [AC_MSG_ERROR([systemd startup notification support requested, but libsystemd not found.])]
         )]
     )
 ])

@@ -1,6 +1,4 @@
 /******************************************************************************
- * $Id$
- *
  * Copyright (c) Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -1547,7 +1545,7 @@ gtr_actions_handler (const char * action_name, gpointer user_data)
     }
   else if (g_strcmp0 (action_name, "donate") == 0)
     {
-      gtr_open_uri ("http://www.transmissionbt.com/donate.php");
+      gtr_open_uri ("https://transmissionbt.com/donate/");
     }
   else if (g_strcmp0 (action_name, "pause-all-torrents") == 0)
     {

@@ -4,7 +4,6 @@
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
- * $Id$
  */
 
 #include <assert.h>
@@ -46,6 +45,7 @@
 #include "port-forwarding.h"
 #include "rpc-server.h"
 #include "session.h"
+#include "session-id.h"
 #include "stats.h"
 #include "torrent.h"
 #include "tr-dht.h" /* tr_dhtUpkeep () */
@@ -600,6 +600,7 @@ tr_sessionInit (const char * configDir,
   session->lock = tr_lockNew ();
   session->cache = tr_cacheNew (1024*1024*2);
   session->magicNumber = SESSION_MAGIC_NUMBER;
+  session->session_id = tr_session_id_new ();
   tr_bandwidthConstruct (&session->bandwidth, session, NULL);
   tr_variantInitList (&session->removedTorrents, 0);
 
@@ -1956,6 +1957,7 @@ tr_sessionClose (tr_session * session)
   tr_variantFree (&session->removedTorrents);
   tr_bandwidthDestruct (&session->bandwidth);
   tr_bitfieldDestruct (&session->turtle.minutes);
+  tr_session_id_free (session->session_id);
   tr_lockFree (session->lock);
   if (session->metainfoLookup)
     {

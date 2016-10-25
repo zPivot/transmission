@@ -56,21 +56,12 @@ else()
     set(TR_STABLE_RELEASE 1)
 endif()
 
-set(TR_SCM_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
-set(TR_SCM_REVISION_RELIABLE ON)
+set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
-if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.svn)
-    if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{SVN_REVISION}" STREQUAL "")
-        # Jenkins automated build, use the set environment variables to avoid
-        # version mismatches between java's svn and command line's svn
-        set(TR_SCM_REVISION "$ENV{SVN_REVISION}")
-    else()
-        find_package(Subversion)
-        if(Subversion_FOUND)
-            Subversion_WC_INFO(${CMAKE_SOURCE_DIR} TR_SVN)
-            set(TR_SCM_REVISION "${TR_SVN_WC_REVISION}")
-        endif()
-    endif()
+if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{VCS_REVISION}" STREQUAL "")
+    # Jenkins automated build, use the set environment variables to avoid
+    # version mismatches between java's svn and command line's svn
+    set(TR_VCS_REVISION "$ENV{VCS_REVISION}")
 elseif(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git)
     find_package(Git)
     if(GIT_FOUND)
@@ -80,38 +71,22 @@ elseif(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git)
             WORKING_DIRECTORY
                 ${CMAKE_SOURCE_DIR}
             OUTPUT_VARIABLE
-                TR_SCM_REVISION
+                TR_VCS_REVISION
             OUTPUT_STRIP_TRAILING_WHITESPACE
         )
     endif()
 endif()
 
-if("${TR_SCM_REVISION}" STREQUAL "" AND EXISTS "${TR_SCM_REVISION_FILE}")
-    file(READ "${TR_SCM_REVISION_FILE}" TR_SCM_REVISION)
-    string(STRIP "${TR_SCM_REVISION}" TR_SCM_REVISION)
+if("${TR_VCS_REVISION}" STREQUAL "" AND EXISTS "${TR_VCS_REVISION_FILE}")
+    file(READ "${TR_VCS_REVISION_FILE}" TR_VCS_REVISION)
+    string(STRIP "${TR_VCS_REVISION}" TR_VCS_REVISION)
 endif()
 
-if("${TR_SCM_REVISION}" STREQUAL "")
-    # Give up and check the source files
-    set(TR_SCM_REVISION 0)
-    set(TR_SCM_REVISION_RELIABLE OFF)
-    file(GLOB_RECURSE TR_ALL_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} *.cc *.[chm] *.po)
-    foreach(F ${TR_ALL_SOURCES})
-        file(STRINGS ${F} F_ID REGEX "\\$Id:")
-        if(F_ID MATCHES "\\$Id: [^ ]+ ([0-9]+) " AND CMAKE_MATCH_1 GREATER TR_SCM_REVISION)
-            set(TR_SCM_REVISION ${CMAKE_MATCH_1})
-        endif()
-    endforeach()
-endif()
-
-if("${TR_SCM_REVISION}" STREQUAL "")
-    set(TR_SCM_REVISION 0)
+if(NOT "${TR_VCS_REVISION}" STREQUAL "")
+    file(WRITE "${TR_VCS_REVISION_FILE}" "${TR_VCS_REVISION}")
 else()
-    if(TR_SCM_REVISION_RELIABLE)
-        file(WRITE "${TR_SCM_REVISION_FILE}" "${TR_SCM_REVISION}")
-    else()
-        file(REMOVE "${TR_SCM_REVISION_FILE}")
-    endif()
+    set(TR_VCS_REVISION 0)
+    file(REMOVE "${TR_VCS_REVISION_FILE}")
 endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -264,7 +239,7 @@ if(ENABLE_QT)
     else()
         set(QT4_REQUIRED_MODULES QtCore QtGui QtNetwork)
         set(QT4_OPTIONAL_MODULES QtDBus QAxContainer QAxServer)
-        find_package(Qt4 4.6.2 QUIET COMPONENTS ${QT4_REQUIRED_MODULES} OPTIONAL_COMPONENTS ${QT4_OPTIONAL_MODULES})
+        find_package(Qt4 4.8.0 QUIET COMPONENTS ${QT4_REQUIRED_MODULES} OPTIONAL_COMPONENTS ${QT4_OPTIONAL_MODULES})
         foreach(M ${QT4_REQUIRED_MODULES})
             string(TOUPPER "${M}" M_UPPER)
             if(QT_${M_UPPER}_FOUND)
@@ -398,9 +373,9 @@ endif()
 if(WITH_SYSTEMD)
     tr_get_required_flag(WITH_SYSTEMD SYSTEMD_IS_REQUIRED)
 
-    pkg_check_modules(SYSTEMD_DAEMON ${SYSTEMD_IS_REQUIRED} libsystemd-daemon)
+    pkg_check_modules(SYSTEMD ${SYSTEMD_IS_REQUIRED} libsystemd)
 
-    tr_fixup_auto_option(WITH_SYSTEMD SYSTEMD_DAEMON_FOUND SYSTEMD_IS_REQUIRED)
+    tr_fixup_auto_option(WITH_SYSTEMD SYSTEMD_FOUND SYSTEMD_IS_REQUIRED)
 endif()
 
 include_directories(${CMAKE_BINARY_DIR})
@@ -571,7 +546,7 @@ if(ENABLE_GTK AND ENABLE_NLS)
 endif()
 
 if(INSTALL_DOC)
-    install(FILES AUTHORS COPYING NEWS README extras/rpc-spec.txt extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
+    install(FILES AUTHORS COPYING NEWS README.md extras/rpc-spec.txt extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
 if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND USE_QT5 AND WITH_CRYPTO STREQUAL "openssl")
