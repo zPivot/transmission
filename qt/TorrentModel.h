@@ -4,13 +4,11 @@
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
- * $Id$
  */
 
 #pragma once
 
 #include <QAbstractListModel>
-#include <QMap>
 #include <QSet>
 #include <QVector>
 
@@ -59,12 +57,11 @@ class TorrentModel: public QAbstractListModel
     void torrentsAdded (QSet<int>);
 
   private:
-    typedef QMap<int, int> id_to_row_t;
-    typedef QMap<int, Torrent*> id_to_torrent_t;
     typedef QVector<Torrent*> torrents_t;
 
   private:
     void addTorrent (Torrent *);
+    void addTorrents (torrents_t&& torrents, QSet<int>& addIds);
     QSet<int> getIds () const;
 
   private slots:
@@ -73,8 +70,6 @@ class TorrentModel: public QAbstractListModel
   private:
     const Prefs& myPrefs;
 
-    id_to_row_t myIdToRow;
-    id_to_torrent_t myIdToTorrent;
     torrents_t myTorrents;
 };
 
