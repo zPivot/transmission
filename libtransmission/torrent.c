@@ -887,7 +887,7 @@ torrentInit (tr_torrent * tor, const tr_ctor * ctor)
 
   tor->finishedSeedingByIdle = false;
 
-  tor->sequentialDownload = false;
+  tor->sequentialDownload = true;
 
   tr_peerMgrAddTorrent (session->peerMgr, tor);
 
